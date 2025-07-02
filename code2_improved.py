@@ -173,6 +173,11 @@ def train_model(X_train, y_train, preprocessor, tune_hyperparams=False):
         ('classifier', LogisticRegression(class_weight=class_weight_dict, max_iter=1000))
     ])
     
+    # Perform cross-validation on training data
+    logger.info("Performing cross-validation on training data...")
+    cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='accuracy')
+    logger.info(f"Cross-validation accuracy: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
+    
     if tune_hyperparams:
         logger.info("Performing hyperparameter tuning...")
         param_grid = {
@@ -209,10 +214,6 @@ def evaluate_model(model, X_test, y_test, label_encoder):
     """
     logger.info("Evaluating model on test set...")
     y_pred = model.predict(X_test)
-    
-    # Cross-validation
-    cv_scores = cross_val_score(model, X_test, y_test, cv=5, scoring='accuracy')
-    logger.info(f"Cross-validation accuracy: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
     
     # Classification report
     report = classification_report(y_test, y_pred, 
